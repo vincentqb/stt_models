@@ -16,6 +16,7 @@ from decoders import GreedyDecoder
 from metrics import compute_wer
 from models import build_deepspeech
 
+torch.multiprocessing.set_start_method('spawn')
 np.random.seed(200)
 torch.manual_seed(200)
 
@@ -96,7 +97,7 @@ def parse_args():
         "--checkpoint", default="", type=str, metavar="PATH",
         help="path to latest checkpoint",
     )
-    parser.add_argument("--datadir", default='/tmp/librispeech')
+    parser.add_argument("--datadir", default='/private/home/vincentqb/tmp/librispeech')
     parser.add_argument("--train-data-urls", type=str, nargs="+", default=['train-clean-100'])
     parser.add_argument("--val-data-urls", type=str, nargs="+", default=['dev-clean'])
     parser.add_argument("--log-steps", type=int, default=100)
@@ -156,6 +157,9 @@ def train_loop_fn(loader,
         # zero the parameter gradients
         optimizer.zero_grad()
         out = model(inputs)
+        # N x T x num_classes
+        out = out.permute(1, 0, 2)
+        # T x N x num_classes
 
         loss = criterion(out, labels, input_lengths, label_lengths)
         loss_value = loss.item()
@@ -315,6 +319,7 @@ def main(index, args):
     in_features = args.n_mfcc * (2 * args.n_context + 1)
     model = build_deepspeech(in_features=in_features, num_classes=len(alphabet))
     model = model.to(device)
+    model = torch.nn.DataParallel(model)
     logging.info("Number of parameters: %s", count_parameters(model))
 
     optimizer = get_optimizer(args, model.parameters())

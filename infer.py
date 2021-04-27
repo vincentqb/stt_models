@@ -23,7 +23,7 @@ def parse_args():
         description="model inference"
     )
     parser.add_argument("--batch-size", type=int, default=2)
-    parser.add_argument("--datadir", default='/tmp/librispeech')
+    parser.add_argument("--datadir", default='/private/home/vincentqb/tmp/librispeech')
     parser.add_argument("--quantize", type=bool, default=False)
     # Preprocessing args
     parser.add_argument(

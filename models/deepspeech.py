@@ -63,7 +63,8 @@ class DeepSpeech(nn.Module):
         self.fc3 = FullyConnected(hidden_size, hidden_size, dropout)
         # The fourth layer is a bi-directional recurrent layer
         self.bi_rnn = nn.RNN(
-            hidden_size, hidden_size, num_layers=1, nonlinearity='relu', bidirectional=True)
+            hidden_size, hidden_size, num_layers=1, nonlinearity='relu', bidirectional=True,
+        )
         self.nonlinearity = nn.ReLU()
         self.fc4 = FullyConnected(hidden_size, hidden_size, dropout)
         # The output layer is a standard softmax function
@@ -86,6 +87,7 @@ class DeepSpeech(nn.Module):
         # N x T x H
         x = x.transpose(0, 1)
         # T x N x H
+        self.bi_rnn.flatten_parameters()
         x, _ = self.bi_rnn(x)
         # The fifth (non-recurrent) layer takes both the forward and backward units as inputs
         x = x[:, :, :self.hidden_size] + x[:, :, self.hidden_size:]
@@ -94,4 +96,6 @@ class DeepSpeech(nn.Module):
         # T x N x H
         x = self.out(x)
         # T x N x num_classes
+        x = x.permute(1, 0, 2)
+        # N x T x num_classes
         return x
