@@ -202,6 +202,9 @@ def test_loop_fn(loader,
     with torch.no_grad():
         for inputs, input_lengths, labels, label_lengths in loader:
             out = model(inputs)
+            # N x T x num_classes
+            out = out.permute(1, 0, 2)
+            # T x N x num_classes
             loss = criterion(out, labels, input_lengths, label_lengths)
 
             iteration += 1
