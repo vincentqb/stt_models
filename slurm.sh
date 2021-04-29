@@ -1,8 +1,8 @@
 #! /bin/bash
 
 #SBATCH --job-name=torchaudiomodel
-#SBATCH --output=/checkpoint/%u/jobs/deepspeech--other-%j.out
-#SBATCH --error=/checkpoint/%u/jobs/deepspeech--other-%j.err
+#SBATCH --output=/checkpoint/%u/jobs/deepspeech-other-%j.out
+#SBATCH --error=/checkpoint/%u/jobs/deepspeech-other-%j.err
 #SBATCH --signal=USR1@600
 #SBATCH --open-mode=append
 #SBATCH --partition=learnfair
